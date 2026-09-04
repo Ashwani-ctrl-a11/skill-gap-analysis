@@ -1,0 +1,60 @@
+{
+  "_comment": "Trainee records for the MVP demo. Each trainee has training info, prior experience, current employment status, and a simulated 3-point longitudinal check-in timeline (Month 1/6/12) — standing in for the real Twilio/EPFO-based tracking described in the production roadmap. resume_file must match a PDF filename in sample_resumes/. Add more trainees anytime by adding a new key below.",
+
+  "trainees": {
+    "trainee_001": {
+      "name": "Trainee One",
+      "resume_file": "trainee_1.pdf",
+      "training_program": "PMKVY - Python Backend Development",
+      "training_start_date": "2026-01-15",
+      "training_duration_months": 4,
+      "prior_experience_years": 0,
+      "employment_status": "Employed",
+      "employment_details": {
+        "job_title": "Junior Backend Developer",
+        "employed_since": "2026-06-01",
+        "matches_trained_field": true
+      },
+      "checkins": [
+        {"month": 1, "status": "Unemployed"},
+        {"month": 6, "status": "Employed", "job_title": "Junior Backend Developer", "matches_trained_field": true},
+        {"month": 12, "status": "Employed", "job_title": "Junior Backend Developer", "matches_trained_field": true}
+      ]
+    },
+
+    "trainee_002": {
+      "name": "Trainee Two",
+      "resume_file": "trainee_2.pdf",
+      "training_program": "PMKVY - Data Analytics",
+      "training_start_date": "2025-11-01",
+      "training_duration_months": 3,
+      "prior_experience_years": 1,
+      "employment_status": "Employed",
+      "employment_details": {
+        "job_title": "Retail Sales Associate",
+        "employed_since": "2026-03-01",
+        "matches_trained_field": false
+      },
+      "checkins": [
+        {"month": 1, "status": "Unemployed"},
+        {"month": 6, "status": "Employed", "job_title": "Retail Sales Associate", "matches_trained_field": false},
+        {"month": 12, "status": "Employed", "job_title": "Retail Sales Associate", "matches_trained_field": false}
+      ]
+    },
+
+    "trainee_003": {
+      "name": "Trainee Three",
+      "resume_file": "trainee_3.pdf",
+      "training_program": "PMKVY - Electrical Technician",
+      "training_start_date": "2026-02-01",
+      "training_duration_months": 6,
+      "prior_experience_years": 2,
+      "employment_status": "Unemployed",
+      "employment_details": null,
+      "checkins": [
+        {"month": 1, "status": "Unemployed"},
+        {"month": 6, "status": "Unemployed"}
+      ]
+    }
+  }
+}

@@ -1,0 +1,357 @@
+{
+  "_comment": "Job dataset for the MVP demo \u2014 35 roles across 12 NSDC-aligned sectors, each with its sector and required skills. Add more roles anytime by adding a new key with 'sector' and 'skills' \u2014 main.py builds its menu automatically from this data, no code changes needed.",
+  "jobs": {
+    "Python Backend Developer": {
+      "sector": "IT & Software",
+      "skills": [
+        "Python",
+        "Django",
+        "REST APIs",
+        "PostgreSQL",
+        "Git",
+        "Teamwork"
+      ]
+    },
+    "Frontend Developer": {
+      "sector": "IT & Software",
+      "skills": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "Git",
+        "Attention to Detail"
+      ]
+    },
+    "Data Analyst": {
+      "sector": "IT & Software",
+      "skills": [
+        "Python",
+        "SQL",
+        "Power BI",
+        "Excel",
+        "Communication"
+      ]
+    },
+    "IT Support Technician": {
+      "sector": "IT & Software",
+      "skills": [
+        "Networking",
+        "Linux",
+        "Hardware Troubleshooting",
+        "Customer Service",
+        "Problem Solving"
+      ]
+    },
+    "Nursing Assistant": {
+      "sector": "Healthcare",
+      "skills": [
+        "Nursing Assistance",
+        "Patient Care",
+        "First Aid",
+        "Communication",
+        "Work Ethic"
+      ]
+    },
+    "Home Health Aide": {
+      "sector": "Healthcare",
+      "skills": [
+        "Home Health Aide",
+        "Patient Care",
+        "First Aid",
+        "Communication",
+        "Adaptability"
+      ]
+    },
+    "Medical Lab Technician": {
+      "sector": "Healthcare",
+      "skills": [
+        "Lab Sample Handling",
+        "Medical Equipment Operation",
+        "Attention to Detail",
+        "Report Documentation",
+        "Patient Care"
+      ]
+    },
+    "Pharmacy Assistant": {
+      "sector": "Healthcare",
+      "skills": [
+        "Medicine Dispensing",
+        "Inventory Management",
+        "Customer Service",
+        "Attention to Detail",
+        "Communication"
+      ]
+    },
+    "Electrical Technician": {
+      "sector": "Electrical & Electronics",
+      "skills": [
+        "Electrical Wiring",
+        "Circuit Testing",
+        "Panel Wiring",
+        "Motor Winding",
+        "Attention to Detail"
+      ]
+    },
+    "Solar Panel Installer": {
+      "sector": "Electrical & Electronics",
+      "skills": [
+        "Solar Panel Installation",
+        "Electrical Wiring",
+        "Circuit Testing",
+        "Safety Compliance",
+        "Work Ethic"
+      ]
+    },
+    "Electronics Repair Technician": {
+      "sector": "Electrical & Electronics",
+      "skills": [
+        "Electronics Repair",
+        "Circuit Testing",
+        "Soldering",
+        "Attention to Detail",
+        "Problem Solving"
+      ]
+    },
+    "Automobile Service Technician": {
+      "sector": "Automotive",
+      "skills": [
+        "Automobile Repair",
+        "Diesel Engine Repair",
+        "Diagnostic Tools Operation",
+        "Attention to Detail",
+        "Work Ethic"
+      ]
+    },
+    "Two-Wheeler Mechanic": {
+      "sector": "Automotive",
+      "skills": [
+        "Two Wheeler Servicing",
+        "Automobile Repair",
+        "Diagnostic Tools Operation",
+        "Customer Service",
+        "Work Ethic"
+      ]
+    },
+    "Retail Sales Associate": {
+      "sector": "Retail & Sales",
+      "skills": [
+        "Retail Sales",
+        "Customer Service",
+        "Point of Sale Operation",
+        "Communication",
+        "Cash Handling"
+      ]
+    },
+    "Store Supervisor": {
+      "sector": "Retail & Sales",
+      "skills": [
+        "Inventory Management",
+        "Team Leadership",
+        "Retail Sales",
+        "Cash Handling",
+        "Problem Solving"
+      ]
+    },
+    "E-commerce Operations Executive": {
+      "sector": "Retail & Sales",
+      "skills": [
+        "Inventory Management",
+        "Order Processing",
+        "Excel",
+        "Communication",
+        "Attention to Detail"
+      ]
+    },
+    "Accounts Executive": {
+      "sector": "BFSI",
+      "skills": [
+        "Tally",
+        "GST Filing",
+        "Bookkeeping",
+        "Excel",
+        "Financial Accounting"
+      ]
+    },
+    "Bank Teller / CSR": {
+      "sector": "BFSI",
+      "skills": [
+        "Bank Teller Operations",
+        "Cash Handling",
+        "Customer Service",
+        "Communication",
+        "Attention to Detail"
+      ]
+    },
+    "Insurance Sales Agent": {
+      "sector": "BFSI",
+      "skills": [
+        "Insurance Sales",
+        "Communication",
+        "Customer Service",
+        "Negotiation",
+        "Public Speaking"
+      ]
+    },
+    "Front Office Executive": {
+      "sector": "Hospitality & Tourism",
+      "skills": [
+        "Front Office Operations",
+        "Customer Service",
+        "Communication",
+        "MS Word",
+        "Multitasking"
+      ]
+    },
+    "Housekeeping Supervisor": {
+      "sector": "Hospitality & Tourism",
+      "skills": [
+        "Housekeeping",
+        "Team Leadership",
+        "Time Management",
+        "Attention to Detail",
+        "Work Ethic"
+      ]
+    },
+    "Chef / Cook": {
+      "sector": "Hospitality & Tourism",
+      "skills": [
+        "Cooking",
+        "Food Safety",
+        "Time Management",
+        "Team Leadership",
+        "Creativity"
+      ]
+    },
+    "Beautician": {
+      "sector": "Beauty & Wellness",
+      "skills": [
+        "Beauty and Wellness",
+        "Customer Service",
+        "Attention to Detail",
+        "Creativity",
+        "Time Management"
+      ]
+    },
+    "Hair Stylist": {
+      "sector": "Beauty & Wellness",
+      "skills": [
+        "Hair Styling",
+        "Beauty and Wellness",
+        "Customer Service",
+        "Creativity",
+        "Attention to Detail"
+      ]
+    },
+    "Plumber": {
+      "sector": "Construction & Trades",
+      "skills": [
+        "Plumbing",
+        "Pipe Fitting",
+        "Safety Compliance",
+        "Problem Solving",
+        "Work Ethic"
+      ]
+    },
+    "Welder": {
+      "sector": "Construction & Trades",
+      "skills": [
+        "Welding",
+        "Safety Compliance",
+        "Attention to Detail",
+        "Blueprint Reading",
+        "Work Ethic"
+      ]
+    },
+    "CNC Machine Operator": {
+      "sector": "Construction & Trades",
+      "skills": [
+        "CNC Machine Operation",
+        "Blueprint Reading",
+        "Quality Inspection",
+        "Attention to Detail",
+        "Safety Compliance"
+      ]
+    },
+    "Digital Marketing Executive": {
+      "sector": "Marketing & Media",
+      "skills": [
+        "Digital Marketing",
+        "SEO",
+        "Social Media Marketing",
+        "Content Writing",
+        "Creativity"
+      ]
+    },
+    "Graphic Designer": {
+      "sector": "Marketing & Media",
+      "skills": [
+        "Graphic Designing",
+        "Creativity",
+        "Attention to Detail",
+        "Adobe Photoshop",
+        "Time Management"
+      ]
+    },
+    "Video Editor": {
+      "sector": "Marketing & Media",
+      "skills": [
+        "Video Editing",
+        "Creativity",
+        "Attention to Detail",
+        "Adobe Premiere Pro",
+        "Time Management"
+      ]
+    },
+    "Vocational Trainer": {
+      "sector": "Education & Training",
+      "skills": [
+        "Vocational Training",
+        "Public Speaking",
+        "Communication",
+        "Curriculum Planning",
+        "Patience"
+      ]
+    },
+    "Teaching Assistant": {
+      "sector": "Education & Training",
+      "skills": [
+        "Classroom Assistance",
+        "Communication",
+        "Patience",
+        "Time Management",
+        "Adaptability"
+      ]
+    },
+    "Warehouse Associate": {
+      "sector": "Logistics & Manufacturing",
+      "skills": [
+        "Inventory Management",
+        "Order Processing",
+        "Forklift Operation",
+        "Attention to Detail",
+        "Work Ethic"
+      ]
+    },
+    "Quality Control Inspector": {
+      "sector": "Logistics & Manufacturing",
+      "skills": [
+        "Quality Inspection",
+        "Attention to Detail",
+        "Report Documentation",
+        "Blueprint Reading",
+        "Problem Solving"
+      ]
+    },
+    "Production Line Supervisor": {
+      "sector": "Logistics & Manufacturing",
+      "skills": [
+        "Team Leadership",
+        "Production Planning",
+        "Quality Inspection",
+        "Time Management",
+        "Problem Solving"
+      ]
+    }
+  }
+}
