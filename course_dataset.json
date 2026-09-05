@@ -1,0 +1,57 @@
+{
+  "_comment": "Course dataset for the Recommendation Engine. Each course lists the skill(s) it teaches. This file is fully editable/expandable — add, remove, or edit any course anytime. The recommendation engine uses SEMANTIC matching (not exact-name lookup), so a new course here is automatically considered for any missing skill whose meaning is close to what it teaches, with no code changes needed.",
+
+  "courses": [
+    {"course_name": "Python Programming Fundamentals - NSDC", "teaches_skills": ["Python"]},
+    {"course_name": "SQL for Data Analysis - NSDC", "teaches_skills": ["SQL", "Database Management"]},
+    {"course_name": "Power BI for Business Analytics - NSDC", "teaches_skills": ["Power BI", "Data Analysis"]},
+    {"course_name": "AWS Cloud Fundamentals - NSDC", "teaches_skills": ["AWS", "Google Cloud", "Azure"]},
+    {"course_name": "Docker & Containerization Basics", "teaches_skills": ["Docker"]},
+    {"course_name": "Django Web Development - NSDC", "teaches_skills": ["Django", "REST APIs"]},
+    {"course_name": "Java & Spring Boot Bootcamp", "teaches_skills": ["Java", "Spring Boot"]},
+    {"course_name": "Frontend Web Development (HTML/CSS/JS)", "teaches_skills": ["HTML", "CSS", "JavaScript", "React"]},
+    {"course_name": "Git & Version Control Essentials", "teaches_skills": ["Git"]},
+    {"course_name": "Networking Fundamentals - NSDC", "teaches_skills": ["Networking", "Linux"]},
+
+    {"course_name": "Nursing Assistant Certification - PMKVY", "teaches_skills": ["Nursing Assistance", "Patient Care", "First Aid"]},
+    {"course_name": "Home Health Aide Training - PMKVY", "teaches_skills": ["Home Health Aide", "Patient Care"]},
+    {"course_name": "Medical Lab Technician Course - PMKVY", "teaches_skills": ["Lab Sample Handling", "Medical Equipment Operation", "Report Documentation"]},
+    {"course_name": "Pharmacy Assistant Training - PMKVY", "teaches_skills": ["Medicine Dispensing"]},
+
+    {"course_name": "Electrical Wiring & Circuit Testing - PMKVY", "teaches_skills": ["Electrical Wiring", "Circuit Testing", "Panel Wiring", "Motor Winding"]},
+    {"course_name": "Solar Panel Installation Course - PMKVY", "teaches_skills": ["Solar Panel Installation"]},
+    {"course_name": "Electronics Repair & Soldering - PMKVY", "teaches_skills": ["Electronics Repair", "Soldering"]},
+
+    {"course_name": "Automobile Servicing Course - PMKVY", "teaches_skills": ["Automobile Repair", "Diesel Engine Repair", "Diagnostic Tools Operation"]},
+    {"course_name": "Two-Wheeler Mechanic Training - PMKVY", "teaches_skills": ["Two Wheeler Servicing"]},
+
+    {"course_name": "Retail Sales Associate Training - PMKVY", "teaches_skills": ["Retail Sales", "Point of Sale Operation", "Cash Handling"]},
+    {"course_name": "Inventory & Warehouse Management - PMKVY", "teaches_skills": ["Inventory Management", "Order Processing", "Forklift Operation"]},
+
+    {"course_name": "Tally & GST Filing Certification - PMKVY", "teaches_skills": ["Tally", "GST Filing", "Bookkeeping", "Financial Accounting"]},
+    {"course_name": "Banking Operations Training - PMKVY", "teaches_skills": ["Bank Teller Operations"]},
+    {"course_name": "Insurance Sales Certification - PMKVY", "teaches_skills": ["Insurance Sales", "Negotiation"]},
+
+    {"course_name": "Front Office & Hospitality Management - PMKVY", "teaches_skills": ["Front Office Operations", "Multitasking"]},
+    {"course_name": "Housekeeping Supervisor Training - PMKVY", "teaches_skills": ["Housekeeping"]},
+    {"course_name": "Professional Cooking & Food Safety - PMKVY", "teaches_skills": ["Cooking", "Food Safety"]},
+
+    {"course_name": "Beauty & Wellness Certification - PMKVY", "teaches_skills": ["Beauty and Wellness"]},
+    {"course_name": "Hair Styling Professional Course - PMKVY", "teaches_skills": ["Hair Styling"]},
+
+    {"course_name": "Plumbing Certification - PMKVY", "teaches_skills": ["Plumbing", "Pipe Fitting"]},
+    {"course_name": "Welding Technology Course - PMKVY", "teaches_skills": ["Welding", "Blueprint Reading"]},
+    {"course_name": "CNC Machine Operation Training - PMKVY", "teaches_skills": ["CNC Machine Operation", "Quality Inspection"]},
+
+    {"course_name": "Digital Marketing Certification - NSDC", "teaches_skills": ["Digital Marketing", "SEO", "Social Media Marketing", "Content Writing"]},
+    {"course_name": "Graphic Design with Adobe Photoshop - NSDC", "teaches_skills": ["Graphic Designing", "Adobe Photoshop"]},
+    {"course_name": "Video Editing with Premiere Pro - NSDC", "teaches_skills": ["Video Editing", "Adobe Premiere Pro"]},
+
+    {"course_name": "Vocational Trainer Certification - PMKVY", "teaches_skills": ["Vocational Training", "Curriculum Planning"]},
+    {"course_name": "Teaching Assistant Foundation Course", "teaches_skills": ["Classroom Assistance"]},
+
+    {"course_name": "Quality Control & Production Planning - PMKVY", "teaches_skills": ["Production Planning", "Safety Compliance"]},
+
+    {"course_name": "Workplace Communication & Soft Skills - NSDC", "teaches_skills": ["Communication", "Teamwork", "Team Leadership", "Public Speaking", "Time Management", "Adaptability", "Work Ethic", "Attention to Detail", "Problem Solving", "Creativity", "Patience", "Customer Service"]}
+  ]
+}

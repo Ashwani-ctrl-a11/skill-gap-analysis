@@ -1,14 +1,29 @@
 {
-  "_comment": "Trainee records for the MVP demo. Each trainee has training info, prior experience, current employment status, and a simulated 3-point longitudinal check-in timeline (Month 1/6/12) — standing in for the real Twilio/EPFO-based tracking described in the production roadmap. resume_file must match a PDF filename in sample_resumes/. Add more trainees anytime by adding a new key below.",
-
+  "_comment": "Trainee records for the MVP demo. Each trainee has a full profile (education, location, category, prior experience, internship), training info, current employment status, and a simulated 3-point longitudinal check-in timeline (Month 1/6/12) \u2014 standing in for the real Twilio/EPFO-based tracking described in the production roadmap. 'target_job' must exactly match a job title key in job_dataset.json (used for skill-gap comparison) \u2014 'training_program' is just the human-readable program name for display. 'training_institute' is informational only, not used in any comparison logic. resume_file must match a PDF filename in sample_resumes/. Add more trainees anytime by adding a new key below.",
   "trainees": {
     "trainee_001": {
+      "username": "trainee1",
       "name": "Trainee One",
       "resume_file": "trainee_1.pdf",
       "training_program": "PMKVY - Python Backend Development",
+      "target_job": "Python Backend Developer",
+      "training_institute": "Delhi Skill Development Center",
       "training_start_date": "2026-01-15",
       "training_duration_months": 4,
+      "education_level": "Bachelor's Degree",
+      "location": {
+        "state": "Delhi",
+        "district": "New Delhi"
+      },
+      "category": "General",
+      "preferred_job_sector": "IT & Software",
       "prior_experience_years": 0,
+      "internship": {
+        "done": true,
+        "organization": "TechStart Solutions",
+        "duration_months": 3,
+        "role": "Backend Development Intern"
+      },
       "employment_status": "Employed",
       "employment_details": {
         "job_title": "Junior Backend Developer",
@@ -16,19 +31,47 @@
         "matches_trained_field": true
       },
       "checkins": [
-        {"month": 1, "status": "Unemployed"},
-        {"month": 6, "status": "Employed", "job_title": "Junior Backend Developer", "matches_trained_field": true},
-        {"month": 12, "status": "Employed", "job_title": "Junior Backend Developer", "matches_trained_field": true}
+        {
+          "month": 1,
+          "status": "Unemployed"
+        },
+        {
+          "month": 6,
+          "status": "Employed",
+          "job_title": "Junior Backend Developer",
+          "matches_trained_field": true
+        },
+        {
+          "month": 12,
+          "status": "Employed",
+          "job_title": "Junior Backend Developer",
+          "matches_trained_field": true
+        }
       ]
     },
-
     "trainee_002": {
+      "username": "trainee2",
       "name": "Trainee Two",
       "resume_file": "trainee_2.pdf",
       "training_program": "PMKVY - Data Analytics",
+      "target_job": "Data Analyst",
+      "training_institute": "Pune Vocational Training Institute",
       "training_start_date": "2025-11-01",
       "training_duration_months": 3,
+      "education_level": "12th Pass",
+      "location": {
+        "state": "Maharashtra",
+        "district": "Pune"
+      },
+      "category": "OBC",
+      "preferred_job_sector": "IT & Software",
       "prior_experience_years": 1,
+      "internship": {
+        "done": false,
+        "organization": null,
+        "duration_months": null,
+        "role": null
+      },
       "employment_status": "Employed",
       "employment_details": {
         "job_title": "Retail Sales Associate",
@@ -36,25 +79,113 @@
         "matches_trained_field": false
       },
       "checkins": [
-        {"month": 1, "status": "Unemployed"},
-        {"month": 6, "status": "Employed", "job_title": "Retail Sales Associate", "matches_trained_field": false},
-        {"month": 12, "status": "Employed", "job_title": "Retail Sales Associate", "matches_trained_field": false}
+        {
+          "month": 1,
+          "status": "Unemployed"
+        },
+        {
+          "month": 6,
+          "status": "Employed",
+          "job_title": "Retail Sales Associate",
+          "matches_trained_field": false
+        },
+        {
+          "month": 12,
+          "status": "Employed",
+          "job_title": "Retail Sales Associate",
+          "matches_trained_field": false
+        }
       ]
     },
-
     "trainee_003": {
+      "username": "trainee3",
       "name": "Trainee Three",
       "resume_file": "trainee_3.pdf",
       "training_program": "PMKVY - Electrical Technician",
+      "target_job": "Electrical Technician",
+      "training_institute": "Jaipur ITI Center",
       "training_start_date": "2026-02-01",
       "training_duration_months": 6,
+      "education_level": "ITI Diploma",
+      "location": {
+        "state": "Rajasthan",
+        "district": "Jaipur"
+      },
+      "category": "SC",
+      "preferred_job_sector": "Electrical & Electronics",
       "prior_experience_years": 2,
+      "internship": {
+        "done": true,
+        "organization": "Rajasthan Electricals Pvt Ltd",
+        "duration_months": 2,
+        "role": "Apprentice Electrician"
+      },
       "employment_status": "Unemployed",
       "employment_details": null,
       "checkins": [
-        {"month": 1, "status": "Unemployed"},
-        {"month": 6, "status": "Unemployed"}
+        {
+          "month": 1,
+          "status": "Unemployed"
+        },
+        {
+          "month": 6,
+          "status": "Unemployed"
+        }
       ]
+    },
+    "trainee_004": {
+      "username": "hardik",
+      "name": "hardik",
+      "resume_file": "trainee_004.pdf",
+      "training_program": "computer science",
+      "target_job": "Python Backend Developer",
+      "training_institute": "miet",
+      "training_start_date": "2/9/2025",
+      "training_duration_months": 48,
+      "education_level": "12th",
+      "location": {
+        "state": "meerut",
+        "district": "up"
+      },
+      "category": "obc",
+      "preferred_job_sector": "Python Backend Developer",
+      "prior_experience_years": 0,
+      "internship": {
+        "done": false,
+        "organization": null,
+        "duration_months": null,
+        "role": null
+      },
+      "employment_status": "Unemployed",
+      "employment_details": null,
+      "checkins": []
+    },
+    "trainee_005": {
+      "username": "rohan69",
+      "name": "Rohan",
+      "resume_file": "trainee_005.pdf",
+      "training_program": "iit-archon front data analysist",
+      "target_job": "Data Analyst",
+      "training_institute": "iit delhi",
+      "training_start_date": "2025-09-01",
+      "training_duration_months": 6,
+      "education_level": "10th Pass",
+      "location": {
+        "state": "uttar pradesh",
+        "district": "modinagar"
+      },
+      "category": "OBC",
+      "preferred_job_sector": "",
+      "prior_experience_years": 0,
+      "internship": {
+        "done": false,
+        "organization": null,
+        "duration_months": null,
+        "role": null
+      },
+      "employment_status": "Unemployed",
+      "employment_details": null,
+      "checkins": []
     }
   }
 }

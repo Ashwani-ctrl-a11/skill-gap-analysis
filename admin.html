@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Tracker — Programme Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B2A4A;
+    --navy-light: #2C4270;
+    --amber: #E8A33D;
+    --bg: #F3F5F1;
+    --panel: #FFFFFF;
+    --text: #2F2F2F;
+    --text-soft: #6B6F76;
+    --border: #DDE1DA;
+    --success: #3F7A5C;
+    --success-bg: #E9F3ED;
+    --danger: #B23A3A;
+    --danger-bg: #FAEBEB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+  h1, h2, h3 { font-family: 'Manrope', sans-serif; color: var(--navy); margin: 0; }
+
+  .shell { max-width: 980px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  header.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  header.top .brand { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 19px; color: var(--navy); }
+  header.top .brand span { color: var(--amber); }
+  header.top .refresh {
+    font-size: 13px; color: var(--navy); cursor: pointer; font-weight: 600;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 20px;
+    padding: 6px 14px;
+  }
+  header.top .refresh:hover { border-color: var(--navy); }
+
+  h1.page-title { font-size: 25px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .lead { color: var(--text-soft); font-size: 14.5px; margin: 0 0 26px; max-width: 60ch; }
+
+  .state-msg {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 40px 20px; text-align: center; color: var(--text-soft); font-size: 14px;
+  }
+
+  /* Programme cards */
+  .programme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 34px;
+  }
+  .programme-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 20px 18px;
+  }
+  .programme-card h3 {
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 14px;
+    min-height: 38px;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13.5px;
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+  }
+  .stat-row:first-of-type { border-top: none; }
+  .stat-row .stat-label { color: var(--text-soft); }
+  .stat-row .stat-value { font-weight: 700; color: var(--navy); }
+  .stat-row .stat-value.good { color: var(--success); }
+  .stat-row .stat-value.bad { color: var(--danger); }
+
+  /* Detail table */
+  .section-heading {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 14px;
+  }
+  table.detail {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+  table.detail th {
+    text-align: left;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 600;
+    padding: 11px 14px;
+    font-size: 12.5px;
+  }
+  table.detail td {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.detail tr:hover td { background: #FAFAF8; }
+
+  .badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .badge.employed { background: var(--success-bg); color: var(--success); }
+  .badge.unemployed { background: var(--danger-bg); color: var(--danger); }
+  .badge.self { background: #EFF0EA; color: var(--text-soft); }
+
+  .field-tag {
+    font-size: 11.5px;
+    color: var(--text-soft);
+    display: block;
+    margin-top: 3px;
+  }
+
+  .missing-skill {
+    display: inline-block;
+    font-size: 12px;
+    background: var(--danger-bg);
+    color: var(--danger);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin: 2px 3px 0 0;
+  }
+
+  .match-bar-wrap {
+    background: #EDEFEA;
+    border-radius: 6px;
+    height: 6px;
+    width: 90px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .match-bar {
+    background: var(--navy);
+    height: 100%;
+  }
+
+  .error-msg {
+    background: var(--danger-bg); color: var(--danger); border-radius: 6px;
+    padding: 10px 14px; font-size: 13.5px; margin-bottom: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="brand">Skill<span>Track</span> — Programme View</div>
+    <div class="refresh" onclick="loadCohort()">Refresh data</div>
+  </header>
+  <h1 class="page-title">Impact across skilling programmes</h1>
+  <p class="lead">Live view of every trainee's employment outcome and skill gap, grouped by the programme they trained under.</p>
+
+  <div id="errorBox"></div>
+  <div id="loadingBox" class="state-msg">Loading cohort data…</div>
+
+  <div id="content" style="display:none;">
+    <div class="programme-grid" id="programmeGrid"></div>
+
+    <h2 class="section-heading">Every trainee</h2>
+    <table class="detail">
+      <thead>
+        <tr>
+          <th>Trainee</th>
+          <th>Programme</th>
+          <th>Employment</th>
+          <th>Skill match</th>
+          <th>Missing skills</th>
+        </tr>
+      </thead>
+      <tbody id="traineeTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const API_BASE = "http://127.0.0.1:8000";
+
+  function employmentBadge(status, inField) {
+    if (status === "Employed") {
+      const tag = inField === true ? "In trained field" : (inField === false ? "Different field" : "");
+      return `<span class="badge employed">Employed</span>` + (tag ? `<span class="field-tag">${tag}</span>` : '');
+    }
+    if (status === "Self-employed") {
+      return `<span class="badge self">Self-employed</span>`;
+    }
+    return `<span class="badge unemployed">Unemployed</span>`;
+  }
+
+  function renderProgrammeCards(byProgram) {
+    const grid = document.getElementById('programmeGrid');
+    grid.innerHTML = '';
+    Object.entries(byProgram).forEach(([program, stats]) => {
+      const card = document.createElement('div');
+      card.className = 'programme-card';
+      const avg = stats.average_skill_match_percent;
+      card.innerHTML = `
+        <h3>${program}</h3>
+        <div class="stat-row"><span class="stat-label">Trainees</span><span class="stat-value">${stats.total_trainees}</span></div>
+        <div class="stat-row"><span class="stat-label">Employed</span><span class="stat-value good">${stats.employed_percent}%</span></div>
+        <div class="stat-row"><span class="stat-label">Employed, in-field</span><span class="stat-value good">${stats.employed_in_field_percent}%</span></div>
+        <div class="stat-row"><span class="stat-label">Unemployed</span><span class="stat-value bad">${stats.unemployed}</span></div>
+        <div class="stat-row"><span class="stat-label">Avg. skill match</span><span class="stat-value">${avg !== null ? avg + '%' : '—'}</span></div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function renderTraineeTable(perTrainee) {
+    const body = document.getElementById('traineeTableBody');
+    body.innerHTML = perTrainee.map(r => {
+      if (r.error) {
+        return `
+          <tr>
+            <td><strong>${r.name}</strong><span class="field-tag">${r.trainee_id}</span></td>
+            <td>${r.training_program}</td>
+            <td colspan="3" style="color:#B23A3A;">${r.error}</td>
+          </tr>`;
+      }
+      const missing = r.missing_skills.length
+        ? r.missing_skills.map(s => `<span class="missing-skill">${s}</span>`).join('')
+        : '<span style="color:#3F7A5C; font-size:12.5px;">None — full match</span>';
+
+      return `
+        <tr>
+          <td><strong>${r.name}</strong><span class="field-tag">${r.trainee_id} · targeting ${r.target_job}</span></td>
+          <td>${r.training_program}</td>
+          <td>${employmentBadge(r.employment_status, r.matches_trained_field)}</td>
+          <td>
+            ${r.skill_match_percent}%
+            <div class="match-bar-wrap"><div class="match-bar" style="width:${r.skill_match_percent}%;"></div></div>
+          </td>
+          <td>${missing}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  async function loadCohort() {
+    document.getElementById('loadingBox').style.display = 'block';
+    document.getElementById('content').style.display = 'none';
+    document.getElementById('errorBox').innerHTML = '';
+
+    try {
+      const res = await fetch(`${API_BASE}/admin/cohort`);
+      if (!res.ok) throw new Error('Server returned an error.');
+      const data = await res.json();
+
+      renderProgrammeCards(data.by_program);
+      renderTraineeTable(data.per_trainee);
+
+      document.getElementById('loadingBox').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    } catch (e) {
+      document.getElementById('loadingBox').style.display = 'none';
+      document.getElementById('errorBox').innerHTML =
+        `<div class="error-msg">Could not load cohort data. Make sure the API is running at ${API_BASE}.</div>`;
+    }
+  }
+
+  loadCohort();
+</script>
+
+</body>
+</html>
