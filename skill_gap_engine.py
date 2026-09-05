@@ -54,9 +54,35 @@ from sentence_transformers import SentenceTransformer, util
 # per request.
 _MODEL = SentenceTransformer("all-MiniLM-L6-v2")
 
-# How similar two skills need to be (0 to 1) to count as "the same skill".
-# Tune this if you see too many false matches/misses during testing.
+# How similar two skills need to be (0 to 1) to count as "the same skill"
+# at all (covered vs missing). Tune this if you see too many false
+# matches/misses during testing. This threshold is intentionally a hard
+# cutoff — match_score_percent and missing_skills below are both computed
+# from it, so anything reading those two fields is unaffected by the
+# proficiency tiers added below.
 MATCH_THRESHOLD = 0.55
+
+# Proficiency tiers give a more honest picture than a single pass/fail cut.
+# A similarity of 0.56 and 0.95 both count as "covered" above, but they are
+# NOT equally strong evidence the trainee actually has that skill — a bare
+# pass just past the threshold is a much weaker signal than a near-exact
+# match. These tiers are additive (a new "proficiency" field per skill);
+# they don't change match_score_percent, matched_skills, or missing_skills,
+# so every existing caller (recommendation_engine, cohort_analytics, api)
+# keeps working unchanged.
+PROFICIENCY_TIERS = [
+    (0.85, "Strong"),        # near-exact / clearly the same skill
+    (0.55, "Adequate"),      # passes the bar, but a weaker match
+    (0.0, "Missing"),        # below MATCH_THRESHOLD
+]
+
+
+def _proficiency_tier(similarity: float) -> str:
+    """Maps a raw similarity score to a human-readable proficiency label."""
+    for cutoff, label in PROFICIENCY_TIERS:
+        if similarity >= cutoff:
+            return label
+    return "Missing"
 
 
 def compute_skill_gap(trainee_skills: list[str], required_skills: list[str]) -> dict:
@@ -92,6 +118,7 @@ def compute_skill_gap(trainee_skills: list[str], required_skills: list[str]) -> 
             "missing_skills": list(required_skills),
             "details": [
                 {"required_skill": s, "status": "missing",
+                 "proficiency": "Missing",
                  "closest_trainee_skill": None, "similarity": 0.0}
                 for s in required_skills
             ],
@@ -127,6 +154,7 @@ def compute_skill_gap(trainee_skills: list[str], required_skills: list[str]) -> 
         details.append({
             "required_skill": req_skill,
             "status": status,
+            "proficiency": _proficiency_tier(best_score),
             "closest_trainee_skill": best_trainee_skill,
             "similarity": round(best_score, 3),
         })
@@ -153,7 +181,7 @@ def print_report(trainee_name: str, job_title: str, result: dict) -> None:
     print("Skill-by-skill breakdown:")
     for d in result["details"]:
         mark = "✅" if d["status"] == "covered" else "❌"
-        print(f"  {mark} {d['required_skill']:<15} "
+        print(f"  {mark} {d['required_skill']:<15} [{d['proficiency']:<10}] "
               f"(closest trainee skill: '{d['closest_trainee_skill']}', "
               f"similarity: {d['similarity']})")
 

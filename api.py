@@ -26,14 +26,14 @@ frontend yet.
 """
 
 import json
-import shutil
+from datetime import date
 from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from resume_parser import parse_resume
+from resume_parser import parse_resume, ResumeTextExtractionError
 from skill_gap_engine import compute_skill_gap
 from recommendation_engine import recommend_courses
 from cohort_analytics import build_cohort_report
@@ -42,6 +42,16 @@ TRAINEE_DATA_PATH = Path("trainee_records.json")
 JOB_DATA_PATH = Path("job_dataset.json")
 RESUME_FOLDER = Path("sample_resumes")
 RESUME_FOLDER.mkdir(exist_ok=True)
+
+# --- Upload validation limits (MVP-level guardrails) ------------------------
+# A real PDF file starts with these bytes ("%PDF-"). Checking this — instead
+# of trusting the filename extension or the browser-supplied content-type,
+# either of which can be spoofed or simply wrong — is a minimal but real
+# check that what was uploaded is actually a PDF before we try to parse it.
+PDF_MAGIC_BYTES = b"%PDF-"
+MAX_RESUME_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB — generous for a text resume,
+                                           # small enough to block accidental
+                                           # huge/wrong-file uploads
 
 app = FastAPI(title="Skill Gap & Employment Outcome Tracker API")
 
@@ -91,6 +101,66 @@ def _next_trainee_id(data: dict) -> str:
     ]
     next_num = (max(existing_numbers) + 1) if existing_numbers else 1
     return f"trainee_{next_num:03d}"
+
+
+def _validate_and_save_resume(resume: UploadFile, trainee_id: str) -> str:
+    """
+    Reads an uploaded resume fully into memory, checks it's actually a PDF
+    (by magic bytes, not just filename/content-type) and under the size
+    cap, then writes it to sample_resumes/. Raises HTTPException on any
+    validation failure. Returns the saved filename.
+    """
+    contents = resume.file.read()
+
+    if len(contents) > MAX_RESUME_SIZE_BYTES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Resume file is too large "
+                   f"(max {MAX_RESUME_SIZE_BYTES // (1024*1024)} MB).",
+        )
+
+    if not contents.startswith(PDF_MAGIC_BYTES):
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file does not appear to be a valid PDF.",
+        )
+
+    resume_filename = f"{trainee_id}.pdf"
+    resume_path = RESUME_FOLDER / resume_filename
+    with open(resume_path, "wb") as f:
+        f.write(contents)
+
+    return resume_filename
+
+
+def _compute_checkin(trainee: dict, jobs: dict) -> dict:
+    """
+    Runs the existing resume_parser + skill_gap_engine against a trainee's
+    CURRENT resume + target_job, and packages the result as one dated
+    check-in entry. This is the same computation get_result() returns —
+    factored out here so both the results endpoint and the check-in/
+    history endpoints share one implementation instead of duplicating it.
+
+    Raises ResumeTextExtractionError if the PDF has no readable text
+    (see resume_parser.py) — callers should catch this and turn it into
+    a clear HTTP error rather than a confusing 0% result.
+    """
+    resume_path = RESUME_FOLDER / trainee["resume_file"]
+    if not resume_path.exists():
+        raise HTTPException(status_code=404, detail="Resume file missing on server.")
+
+    trainee_skills = parse_resume(str(resume_path), is_pdf=True)
+    required_skills = jobs[trainee["target_job"]]["skills"]
+    gap_result = compute_skill_gap(trainee_skills, required_skills)
+
+    return {
+        "date": date.today().isoformat(),
+        "employment_status": trainee.get("employment_status"),
+        "job_title": (trainee.get("employment_details") or {}).get("job_title"),
+        "matches_trained_field": (trainee.get("employment_details") or {}).get("matches_trained_field"),
+        "skill_match_percent": gap_result["match_score_percent"],
+        "missing_skills": gap_result["missing_skills"],
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -179,11 +249,8 @@ def submit_profile(
                    f"Available jobs: {list(jobs.keys())}",
         )
 
-    # Save the uploaded resume into sample_resumes/, named after the trainee_id
-    resume_filename = f"{trainee_id}.pdf"
-    resume_path = RESUME_FOLDER / resume_filename
-    with open(resume_path, "wb") as f:
-        shutil.copyfileobj(resume.file, f)
+    # Validates it's actually a PDF and under the size cap before saving.
+    resume_filename = _validate_and_save_resume(resume, trainee_id)
 
     employment_details = None
     if employment_status == "Employed":
@@ -214,6 +281,17 @@ def submit_profile(
         "employment_status": employment_status,
         "employment_details": employment_details,
     })
+
+    # Record this submission as check-in #1 — the "program start" baseline
+    # snapshot that later check-ins (weekly/monthly) get compared against.
+    jobs = _load_jobs()
+    try:
+        first_checkin = _compute_checkin(data["trainees"][trainee_id], jobs)
+        data["trainees"][trainee_id]["checkins"] = [first_checkin]
+    except ResumeTextExtractionError as e:
+        _save_trainees(data)  # keep the profile fields, just skip the check-in
+        raise HTTPException(status_code=400, detail=str(e))
+
     _save_trainees(data)
 
     return {"message": "Profile updated successfully.", "trainee_id": trainee_id}
@@ -240,7 +318,11 @@ def get_result(trainee_id: str):
     if not resume_path.exists():
         raise HTTPException(status_code=404, detail="Resume file missing on server.")
 
-    trainee_skills = parse_resume(str(resume_path), is_pdf=True)
+    try:
+        trainee_skills = parse_resume(str(resume_path), is_pdf=True)
+    except ResumeTextExtractionError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     required_skills = jobs[trainee["target_job"]]["skills"]
     gap_result = compute_skill_gap(trainee_skills, required_skills)
     recommendations = recommend_courses(gap_result["missing_skills"])
@@ -253,7 +335,84 @@ def get_result(trainee_id: str):
         "match_score_percent": gap_result["match_score_percent"],
         "matched_skills": gap_result["matched_skills"],
         "missing_skills": gap_result["missing_skills"],
+        "skill_details": gap_result["details"],  # includes per-skill proficiency tiers
         "recommendations": recommendations,
+    }
+
+
+# ---------------------------------------------------------------------------
+# 4b. Record a new check-in — a periodic (weekly/monthly) re-snapshot of a
+#     trainee's skill gap + employment status, tracked from the point their
+#     programme started (check-in #1, created automatically in the profile
+#     endpoint above) through however many follow-ups get recorded over time.
+# ---------------------------------------------------------------------------
+@app.post("/trainee/{trainee_id}/checkin")
+def add_checkin(
+    trainee_id: str,
+    employment_status: str = Form("Unemployed"),
+    employment_job_title: str = Form(""),
+    matches_trained_field: bool = Form(False),
+    resume: Optional[UploadFile] = File(None),
+):
+    """
+    Records a new check-in for a trainee already in the system. If a new
+    resume is uploaded, it replaces the stored one and skills are
+    re-parsed from it; otherwise the existing resume on file is re-scored
+    (useful for a pure employment-status update with no new resume).
+    """
+    data = _load_trainees()
+    if trainee_id not in data["trainees"]:
+        raise HTTPException(status_code=404, detail="Trainee ID not found.")
+
+    trainee = data["trainees"][trainee_id]
+    if not trainee.get("target_job"):
+        raise HTTPException(
+            status_code=400,
+            detail="Trainee has not completed their initial profile yet.",
+        )
+
+    if resume is not None:
+        resume_filename = _validate_and_save_resume(resume, trainee_id)
+        trainee["resume_file"] = resume_filename
+
+    employment_details = None
+    if employment_status == "Employed":
+        employment_details = {
+            "job_title": employment_job_title,
+            "employed_since": None,
+            "matches_trained_field": matches_trained_field,
+        }
+    trainee["employment_status"] = employment_status
+    trainee["employment_details"] = employment_details
+
+    jobs = _load_jobs()
+    try:
+        new_checkin = _compute_checkin(trainee, jobs)
+    except ResumeTextExtractionError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    trainee.setdefault("checkins", []).append(new_checkin)
+    _save_trainees(data)
+
+    return {"message": "Check-in recorded.", "checkin": new_checkin}
+
+
+# ---------------------------------------------------------------------------
+# 4c. Full check-in history for a trainee — the "from program start,
+#     tracked at intervals" timeline.
+# ---------------------------------------------------------------------------
+@app.get("/trainee/{trainee_id}/history")
+def get_history(trainee_id: str):
+    data = _load_trainees()
+    if trainee_id not in data["trainees"]:
+        raise HTTPException(status_code=404, detail="Trainee ID not found.")
+
+    trainee = data["trainees"][trainee_id]
+    return {
+        "trainee_id": trainee_id,
+        "name": trainee["name"],
+        "target_job": trainee.get("target_job"),
+        "checkins": trainee.get("checkins", []),
     }
 
 

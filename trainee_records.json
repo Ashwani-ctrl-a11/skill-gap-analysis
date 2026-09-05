@@ -1,5 +1,5 @@
 {
-  "_comment": "Trainee records for the MVP demo. Each trainee has a full profile (education, location, category, prior experience, internship), training info, current employment status, and a simulated 3-point longitudinal check-in timeline (Month 1/6/12) \u2014 standing in for the real Twilio/EPFO-based tracking described in the production roadmap. 'target_job' must exactly match a job title key in job_dataset.json (used for skill-gap comparison) \u2014 'training_program' is just the human-readable program name for display. 'training_institute' is informational only, not used in any comparison logic. resume_file must match a PDF filename in sample_resumes/. Add more trainees anytime by adding a new key below.",
+  "_comment": "Trainee records for the MVP demo. Each trainee has a full profile (education, location, category, prior experience, internship), training info, current employment status, and a 'checkins' timeline. Each checkin is a dated snapshot: {date, employment_status, job_title, matches_trained_field, skill_match_percent, missing_skills} \u2014 checkin[0] is created automatically when a trainee first submits their profile (program-start baseline), and later entries are added via POST /trainee/{id}/checkin as periodic (e.g. weekly/monthly) follow-ups, standing in for the real Twilio/EPFO-based tracking described in the production roadmap. 'target_job' must exactly match a job title key in job_dataset.json (used for skill-gap comparison) \u2014 'training_program' is just the human-readable program name for display. 'training_institute' is informational only, not used in any comparison logic. resume_file must match a PDF filename in sample_resumes/. Add more trainees anytime by adding a new key below.",
   "trainees": {
     "trainee_001": {
       "username": "trainee1",
@@ -32,20 +32,37 @@
       },
       "checkins": [
         {
-          "month": 1,
-          "status": "Unemployed"
+          "date": "2026-01-15",
+          "employment_status": "Unemployed",
+          "job_title": null,
+          "matches_trained_field": null,
+          "skill_match_percent": 55.0,
+          "missing_skills": [
+            "Django",
+            "REST APIs",
+            "Teamwork"
+          ]
         },
         {
-          "month": 6,
-          "status": "Employed",
-          "job_title": "Junior Backend Developer",
-          "matches_trained_field": true
+          "date": "2026-04-15",
+          "employment_status": "Unemployed",
+          "job_title": null,
+          "matches_trained_field": null,
+          "skill_match_percent": 66.7,
+          "missing_skills": [
+            "REST APIs",
+            "Teamwork"
+          ]
         },
         {
-          "month": 12,
-          "status": "Employed",
+          "date": "2026-06-01",
+          "employment_status": "Employed",
           "job_title": "Junior Backend Developer",
-          "matches_trained_field": true
+          "matches_trained_field": true,
+          "skill_match_percent": 83.3,
+          "missing_skills": [
+            "Teamwork"
+          ]
         }
       ]
     },
@@ -80,20 +97,28 @@
       },
       "checkins": [
         {
-          "month": 1,
-          "status": "Unemployed"
+          "date": "2025-11-01",
+          "employment_status": "Unemployed",
+          "job_title": null,
+          "matches_trained_field": null,
+          "skill_match_percent": 40.0,
+          "missing_skills": [
+            "Power BI",
+            "Excel",
+            "Communication"
+          ]
         },
         {
-          "month": 6,
-          "status": "Employed",
+          "date": "2026-03-01",
+          "employment_status": "Employed",
           "job_title": "Retail Sales Associate",
-          "matches_trained_field": false
-        },
-        {
-          "month": 12,
-          "status": "Employed",
-          "job_title": "Retail Sales Associate",
-          "matches_trained_field": false
+          "matches_trained_field": false,
+          "skill_match_percent": 40.0,
+          "missing_skills": [
+            "Power BI",
+            "Excel",
+            "Communication"
+          ]
         }
       ]
     },
@@ -124,66 +149,53 @@
       "employment_details": null,
       "checkins": [
         {
-          "month": 1,
-          "status": "Unemployed"
+          "date": "2026-02-01",
+          "employment_status": "Unemployed",
+          "job_title": null,
+          "matches_trained_field": null,
+          "skill_match_percent": 45.0,
+          "missing_skills": [
+            "Panel Wiring",
+            "Motor Winding"
+          ]
         },
         {
-          "month": 6,
-          "status": "Unemployed"
+          "date": "2026-08-01",
+          "employment_status": "Unemployed",
+          "job_title": null,
+          "matches_trained_field": null,
+          "skill_match_percent": 45.0,
+          "missing_skills": [
+            "Panel Wiring",
+            "Motor Winding"
+          ]
         }
       ]
     },
     "trainee_004": {
-      "username": "hardik",
-      "name": "hardik",
-      "resume_file": "trainee_004.pdf",
-      "training_program": "computer science",
-      "target_job": "Python Backend Developer",
-      "training_institute": "miet",
-      "training_start_date": "2/9/2025",
-      "training_duration_months": 48,
-      "education_level": "12th",
+      "username": "hardik23",
+      "name": "Hardik sharma",
+      "resume_file": null,
+      "training_program": null,
+      "target_job": null,
+      "training_institute": null,
+      "training_start_date": null,
+      "training_duration_months": null,
+      "education_level": null,
       "location": {
-        "state": "meerut",
-        "district": "up"
+        "state": null,
+        "district": null
       },
-      "category": "obc",
-      "preferred_job_sector": "Python Backend Developer",
-      "prior_experience_years": 0,
+      "category": null,
+      "preferred_job_sector": null,
+      "prior_experience_years": null,
       "internship": {
         "done": false,
         "organization": null,
         "duration_months": null,
         "role": null
       },
-      "employment_status": "Unemployed",
-      "employment_details": null,
-      "checkins": []
-    },
-    "trainee_005": {
-      "username": "rohan69",
-      "name": "Rohan",
-      "resume_file": "trainee_005.pdf",
-      "training_program": "iit-archon front data analysist",
-      "target_job": "Data Analyst",
-      "training_institute": "iit delhi",
-      "training_start_date": "2025-09-01",
-      "training_duration_months": 6,
-      "education_level": "10th Pass",
-      "location": {
-        "state": "uttar pradesh",
-        "district": "modinagar"
-      },
-      "category": "OBC",
-      "preferred_job_sector": "",
-      "prior_experience_years": 0,
-      "internship": {
-        "done": false,
-        "organization": null,
-        "duration_months": null,
-        "role": null
-      },
-      "employment_status": "Unemployed",
+      "employment_status": null,
       "employment_details": null,
       "checkins": []
     }

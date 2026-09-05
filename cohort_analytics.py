@@ -4,10 +4,9 @@ from the problem statement, not just individual skill gaps.
 
 WHAT THIS FILE DOES
 --------------------
-Reads trainee_records.json (profile + employment status for every trainee),
-runs each trainee's actual resume through the SAME resume_parser.py and
-skill_gap_engine.py already built and tested — comparing each trainee
-against their own target_job — and produces two things:
+Reads trainee_records.json — including each trainee's check-in history
+(dated skill-gap + employment snapshots, tracked from the point their
+programme started) — and produces:
 
 1. AGGREGATE SUMMARY per training program, e.g.:
        "PMKVY - Python Backend Development: 5 trainees,
@@ -16,27 +15,38 @@ against their own target_job — and produces two things:
    is working — not just one person's result.
 
 2. PER-TRAINEE DETAIL TABLE, e.g.:
-       Trainee One | Python Backend Dev | Employed | In-field | 83% | Missing: Teamwork
-   This is the "who is struggling and with what" view an admin/
-   counsellor would actually use to decide who needs follow-up training.
+       Trainee One | Python Backend Dev | Employed | In-field | 83%
+       (+28.3 pts since programme start) | Missing: Teamwork
+   This is the "who is struggling, with what, and are they improving"
+   view an admin/counsellor would actually use to decide who needs
+   follow-up training.
 
 WHY THIS FILE DOESN'T DUPLICATE ANY LOGIC
 -------------------------------------------
-It doesn't re-implement skill matching — it just CALLS parse_resume()
-and compute_skill_gap(), exactly like main.py does. This file's only
-new logic is: loop over every trainee, and aggregate the results.
+It reads the LATEST recorded check-in for each trainee — the same
+check-in data api.py's /trainee/{id}/checkin endpoint computes via
+parse_resume() + compute_skill_gap() when it's recorded. This file does
+not re-run the AI pipeline; it reports on results already computed and
+stored, so a cohort report reflects each trainee's most recent check-in,
+not a fresh re-scan on every page load.
+
+For any trainee with NO check-in history yet (e.g. records added by hand
+without going through the API), it falls back to computing live from
+their resume, so the report never silently skips someone.
 """
 
 import json
 from pathlib import Path
 from statistics import mean
 
-from resume_parser import parse_resume
+from resume_parser import parse_resume, ResumeTextExtractionError
 from skill_gap_engine import compute_skill_gap
 
 TRAINEE_DATA_PATH = Path("trainee_records.json")
 JOB_DATA_PATH = Path("job_dataset.json")
 RESUME_FOLDER = Path("sample_resumes")
+
+UNASSIGNED_PROGRAM_LABEL = "No programme assigned yet"
 
 
 # ---------------------------------------------------------------------------
@@ -57,47 +67,93 @@ def _load_jobs() -> dict:
 # ---------------------------------------------------------------------------
 def analyze_trainee(trainee_id: str, trainee: dict, jobs: dict) -> dict:
     """
-    Runs one trainee's resume through the existing parser + skill-gap
-    engine against their own target_job, and combines it with their
-    stored profile/employment data into one flat record.
+    Builds one flat summary record for a trainee, combining their stored
+    profile with the latest available skill-gap snapshot — preferring
+    their recorded check-in history (fast, already computed), and only
+    falling back to a live resume re-scan if no check-in exists yet.
     """
-    resume_path = RESUME_FOLDER / trainee["resume_file"]
+    program = trainee.get("training_program") or UNASSIGNED_PROGRAM_LABEL
+    base = {
+        "trainee_id": trainee_id,
+        "name": trainee["name"],
+        "training_program": program,
+        "target_job": trainee.get("target_job"),
+        "employment_status": trainee.get("employment_status"),
+        "matches_trained_field": (
+            trainee["employment_details"]["matches_trained_field"]
+            if trainee.get("employment_details") else None
+        ),
+    }
 
-    if not resume_path.exists():
-        # Don't crash the whole report if one resume file is missing —
-        # just flag it and move on, so the rest of the cohort still shows.
+    if not trainee.get("target_job"):
         return {
-            "trainee_id": trainee_id,
-            "name": trainee["name"],
-            "training_program": trainee["training_program"],
-            "target_job": trainee["target_job"],
-            "employment_status": trainee["employment_status"],
-            "matches_trained_field": (
-                trainee["employment_details"]["matches_trained_field"]
-                if trainee.get("employment_details") else None
-            ),
+            **base,
             "skill_match_percent": None,
             "missing_skills": None,
+            "checkin_count": 0,
+            "skill_match_trend": None,
+            "error": "Trainee has not completed their profile yet.",
+        }
+
+    checkins = trainee.get("checkins", [])
+
+    if checkins:
+        # Prefer recorded history — already computed, and this is what
+        # gives us the "trend since programme start" figure.
+        first_checkin = checkins[0]
+        latest_checkin = checkins[-1]
+
+        trend = None
+        if len(checkins) > 1:
+            trend = round(
+                latest_checkin["skill_match_percent"] - first_checkin["skill_match_percent"], 1
+            )
+
+        return {
+            **base,
+            "skill_match_percent": latest_checkin["skill_match_percent"],
+            "missing_skills": latest_checkin["missing_skills"],
+            "checkin_count": len(checkins),
+            "skill_match_trend": trend,
+            "error": None,
+        }
+
+    # No check-in history recorded yet (e.g. hand-added data) — fall back
+    # to computing live, so this trainee still appears in the report.
+    resume_file = trainee.get("resume_file")
+    resume_path = RESUME_FOLDER / resume_file if resume_file else None
+
+    if not resume_path or not resume_path.exists():
+        return {
+            **base,
+            "skill_match_percent": None,
+            "missing_skills": None,
+            "checkin_count": 0,
+            "skill_match_trend": None,
             "error": f"Resume file not found: {resume_path}",
         }
 
-    trainee_skills = parse_resume(str(resume_path), is_pdf=True)
+    try:
+        trainee_skills = parse_resume(str(resume_path), is_pdf=True)
+    except ResumeTextExtractionError as e:
+        return {
+            **base,
+            "skill_match_percent": None,
+            "missing_skills": None,
+            "checkin_count": 0,
+            "skill_match_trend": None,
+            "error": str(e),
+        }
+
     required_skills = jobs[trainee["target_job"]]["skills"]
     gap_result = compute_skill_gap(trainee_skills, required_skills)
 
-    matches_field = None
-    if trainee["employment_status"] == "Employed" and trainee.get("employment_details"):
-        matches_field = trainee["employment_details"]["matches_trained_field"]
-
     return {
-        "trainee_id": trainee_id,
-        "name": trainee["name"],
-        "training_program": trainee["training_program"],
-        "target_job": trainee["target_job"],
-        "employment_status": trainee["employment_status"],
-        "matches_trained_field": matches_field,
+        **base,
         "skill_match_percent": gap_result["match_score_percent"],
         "missing_skills": gap_result["missing_skills"],
+        "checkin_count": 0,
+        "skill_match_trend": None,
         "error": None,
     }
 
@@ -118,7 +174,8 @@ def build_cohort_report() -> dict:
                     "unemployed": 0,
                     "employed_in_field": 1,
                     "employed_in_field_percent": 100.0,
-                    "average_skill_match_percent": 83.3
+                    "average_skill_match_percent": 83.3,
+                    "average_skill_match_trend": 28.3
                 },
                 ...
             }
@@ -131,7 +188,6 @@ def build_cohort_report() -> dict:
         analyze_trainee(tid, t, jobs) for tid, t in trainees.items()
     ]
 
-    # Group results by training_program
     by_program: dict[str, list[dict]] = {}
     for result in per_trainee_results:
         by_program.setdefault(result["training_program"], []).append(result)
@@ -146,6 +202,10 @@ def build_cohort_report() -> dict:
                          if r["skill_match_percent"] is not None]
         avg_score = round(mean(valid_scores), 1) if valid_scores else None
 
+        valid_trends = [r["skill_match_trend"] for r in results
+                          if r["skill_match_trend"] is not None]
+        avg_trend = round(mean(valid_trends), 1) if valid_trends else None
+
         program_summaries[program] = {
             "total_trainees": total,
             "employed": employed,
@@ -154,6 +214,7 @@ def build_cohort_report() -> dict:
             "employed_in_field": in_field,
             "employed_in_field_percent": round(100 * in_field / total, 1) if total else 0.0,
             "average_skill_match_percent": avg_score,
+            "average_skill_match_trend": avg_trend,
         }
 
     return {
@@ -180,6 +241,10 @@ def print_cohort_report(report: dict) -> None:
         avg = stats['average_skill_match_percent']
         print(f"  Average skill match:      {avg}%" if avg is not None
               else "  Average skill match:      N/A")
+        trend = stats['average_skill_match_trend']
+        if trend is not None:
+            sign = "+" if trend >= 0 else ""
+            print(f"  Avg. change since start:  {sign}{trend} pts")
 
     print("\n" + "=" * 70)
     print("PER-TRAINEE DETAIL")
@@ -193,7 +258,10 @@ def print_cohort_report(report: dict) -> None:
         print(f"  Employment:       {r['employment_status']}"
               + (f" (in-field: {r['matches_trained_field']})"
                  if r["matches_trained_field"] is not None else ""))
-        print(f"  Skill match:      {r['skill_match_percent']}%")
+        print(f"  Skill match:      {r['skill_match_percent']}%"
+              + (f" ({'+' if r['skill_match_trend'] >= 0 else ''}{r['skill_match_trend']} pts since start)"
+                 if r["skill_match_trend"] is not None else ""))
+        print(f"  Check-ins recorded: {r['checkin_count']}")
         print(f"  Missing skills:   {r['missing_skills'] or 'None'}")
 
 

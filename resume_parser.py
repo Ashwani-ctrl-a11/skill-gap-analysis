@@ -51,6 +51,40 @@ _TAXONOMY_EMBEDDINGS = _MODEL.encode(_TAXONOMY_SKILLS, convert_to_tensor=True)
 SEMANTIC_MATCH_THRESHOLD = 0.6  # stricter than the gap engine's threshold,
                                  # since resume text is noisier than a clean skill list
 
+# Below this many extracted characters, we assume the PDF is a scanned
+# image (no embedded text layer) rather than a genuinely short/empty resume.
+# pdfplumber only reads embedded digital text — it has no OCR fallback,
+# so a scanned resume silently produces "" and would otherwise look like
+# a valid resume with zero skills. We raise instead, so the caller can show
+# a clear message rather than a confusing 0% match.
+MIN_EXTRACTED_TEXT_CHARS = 30
+
+# Skills whose taxonomy name is short/generic enough that a plain word-boundary
+# match produces false positives — e.g. "C" matching a middle initial ("John C.
+# Smith"), a grade ("Grade: C"), or a bullet-list letter ("A. ... B. ... C. ...").
+# For these, we require additional surrounding context before counting it as
+# a real match, instead of the normal bare word-boundary check.
+_CONTEXT_GUARD_PATTERNS = {
+    "C": [
+        r"\bc\s*/\s*c\+\+",            # "C/C++"
+        r"\bc\s*,\s*c\+\+",            # "C, C++"
+        r"\bc\+\+\s*,\s*c\b",          # "C++, C"
+        r"\bc\s+programming\b",        # "C programming"
+        r"\bc\s+language\b",           # "C language"
+        r"languages?\s*[:\-]?[^.\n]{0,40}\bc\b",   # "Languages: C, Java"
+        r"\bproficient\s+in[^.\n]{0,40}\bc\b",     # "proficient in ... C"
+    ],
+}
+
+
+class ResumeTextExtractionError(Exception):
+    """
+    Raised when a PDF yields little to no extractable text — almost always
+    a scanned/image-only resume with no embedded text layer, which
+    pdfplumber cannot read (it has no OCR fallback in this MVP).
+    """
+    pass
+
 
 # ---------------------------------------------------------------------------
 # Text extraction
@@ -81,6 +115,15 @@ def _exact_match_skills(full_text: str) -> set[str]:
     text_lower = full_text.lower()
     found = set()
     for skill in _TAXONOMY_SKILLS:
+        if skill in _CONTEXT_GUARD_PATTERNS:
+            # Short/generic skill name (e.g. "C") — require one of the
+            # specific surrounding-context patterns instead of a bare
+            # word-boundary match, to avoid matching initials, grades,
+            # or bullet-list letters.
+            if any(re.search(p, text_lower) for p in _CONTEXT_GUARD_PATTERNS[skill]):
+                found.add(skill)
+            continue
+
         # word-boundary-ish check so "R" doesn't match inside "ारray" etc.
         pattern = re.escape(skill.lower())
         if re.search(rf"\b{pattern}\b", text_lower):
@@ -134,6 +177,18 @@ def parse_resume(source: str, is_pdf: bool = True) -> list[str]:
         ["Communication", "Excel", "Python", "SQL"]
     """
     full_text = _extract_text_from_pdf(source) if is_pdf else source
+
+    if is_pdf and len(full_text.strip()) < MIN_EXTRACTED_TEXT_CHARS:
+        # Almost certainly a scanned/image-only PDF — pdfplumber found no
+        # real embedded text layer to read. Raise rather than silently
+        # returning [] (which would look like "0 skills found", not
+        # "we couldn't read this file at all").
+        raise ResumeTextExtractionError(
+            "This PDF appears to be a scanned image rather than a "
+            "text-based document, so no skills could be read from it. "
+            "Please upload a resume exported as text (e.g. from Word or "
+            "Google Docs), not a scanned photo or image-only PDF."
+        )
 
     if not full_text.strip():
         return []

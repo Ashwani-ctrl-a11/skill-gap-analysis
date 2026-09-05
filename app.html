@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skill Tracker — For Trainees</title>
+<title>SkillTrack — Skill Gap & Employment Outcome Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -21,9 +21,7 @@
     --danger: #B23A3A;
     --danger-bg: #FAEBEB;
   }
-
   * { box-sizing: border-box; }
-
   body {
     margin: 0;
     background: var(--bg);
@@ -31,35 +29,56 @@
     font-family: 'Inter', sans-serif;
     line-height: 1.5;
   }
+  h1, h2, h3 { font-family: 'Manrope', sans-serif; color: var(--navy); margin: 0; }
 
-  h1, h2, h3 {
-    font-family: 'Manrope', sans-serif;
-    color: var(--navy);
-    margin: 0;
+  /* ---------- Top-level app nav (shared) ---------- */
+  .app-nav {
+    background: var(--navy);
+    padding: 0 20px;
   }
-
-  .shell {
-    max-width: 640px;
+  .app-nav-inner {
+    max-width: 980px;
     margin: 0 auto;
-    padding: 32px 20px 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
   }
+  .app-brand {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+  }
+  .app-brand span { color: var(--amber); }
+  .app-switch { display: flex; gap: 4px; }
+  .app-switch button {
+    background: transparent;
+    border: none;
+    color: #C7CEDD;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .app-switch button.active { background: rgba(255,255,255,0.12); color: #fff; }
+  .app-switch button:hover:not(.active) { color: #fff; }
+
+  .app-page { display: none; }
+  .app-page.active { display: block; }
+
+  /* ---------- Trainee portal ---------- */
+  .shell { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; }
 
   header.top {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 28px;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    min-height: 24px;
   }
-
-  header.top .brand {
-    font-family: 'Manrope', sans-serif;
-    font-weight: 800;
-    font-size: 19px;
-    color: var(--navy);
-  }
-
-  header.top .brand span { color: var(--amber); }
-
   .id-pill {
     font-size: 13px;
     color: var(--text-soft);
@@ -79,30 +98,16 @@
     padding: 28px 26px;
   }
 
-  .lead {
-    color: var(--text-soft);
-    font-size: 15px;
-    margin: 8px 0 24px;
-    max-width: 46ch;
-  }
+  .lead { color: var(--text-soft); font-size: 15px; margin: 8px 0 24px; max-width: 46ch; }
 
   h1.page-title { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
   h2.section-title { font-size: 17px; font-weight: 700; margin: 30px 0 4px; }
   h2.section-title:first-child { margin-top: 0; }
 
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--navy);
-    margin: 16px 0 6px;
-  }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--navy); margin: 16px 0 6px; }
   label:first-of-type { margin-top: 4px; }
 
-  input[type="text"],
-  input[type="number"],
-  input[type="date"],
-  select {
+  input[type="text"], input[type="number"], input[type="date"], select {
     width: 100%;
     padding: 10px 12px;
     font-family: 'Inter', sans-serif;
@@ -112,19 +117,10 @@
     background: #fff;
     color: var(--text);
   }
-  input:focus, select:focus {
-    outline: 2px solid var(--navy-light);
-    outline-offset: 1px;
-  }
+  input:focus, select:focus { outline: 2px solid var(--navy-light); outline-offset: 1px; }
 
-  .row2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-  @media (max-width: 480px) {
-    .row2 { grid-template-columns: 1fr; }
-  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
 
   .file-drop {
     border: 1.5px dashed var(--border);
@@ -158,97 +154,121 @@
     margin-top: 26px;
   }
   .btn:hover { background: var(--navy-light); }
-  .btn.secondary {
-    background: transparent;
-    color: var(--navy);
-    border: 1px solid var(--border);
-    margin-left: 10px;
-  }
+  .btn.secondary { background: transparent; color: var(--navy); border: 1px solid var(--border); margin-left: 10px; }
   .btn.secondary:hover { border-color: var(--navy); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .error-msg {
-    background: var(--danger-bg);
-    color: var(--danger);
-    border-radius: 6px;
-    padding: 10px 14px;
-    font-size: 13.5px;
-    margin-top: 14px;
-    display: none;
+    background: var(--danger-bg); color: var(--danger); border-radius: 6px;
+    padding: 10px 14px; font-size: 13.5px; margin-top: 14px; display: none;
   }
   .error-msg.show { display: block; }
 
   .tabs { display: flex; gap: 4px; margin-bottom: 22px; }
   .tab {
-    flex: 1;
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-soft);
-    border-bottom: 2px solid var(--border);
-    cursor: pointer;
+    flex: 1; text-align: center; padding: 10px; font-size: 14px; font-weight: 600;
+    color: var(--text-soft); border-bottom: 2px solid var(--border); cursor: pointer;
   }
   .tab.active { color: var(--navy); border-bottom-color: var(--navy); }
 
-  /* Results view */
   .score-block {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 20px 0 26px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 22px;
+    display: flex; align-items: center; gap: 20px;
+    padding: 20px 0 26px; border-bottom: 1px solid var(--border); margin-bottom: 22px;
   }
-  .score-number {
-    font-family: 'Manrope', sans-serif;
-    font-size: 44px;
-    font-weight: 800;
-    color: var(--navy);
-    line-height: 1;
-  }
+  .score-number { font-family: 'Manrope', sans-serif; font-size: 44px; font-weight: 800; color: var(--navy); line-height: 1; }
   .score-label { color: var(--text-soft); font-size: 14px; max-width: 26ch; }
 
   .skill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .skill-chip {
-    font-size: 13px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
+  .skill-chip { font-size: 13px; padding: 5px 12px; border-radius: 20px; font-weight: 500; }
   .skill-chip.have { background: var(--success-bg); color: var(--success); }
   .skill-chip.missing { background: var(--danger-bg); color: var(--danger); }
 
   .course-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px;
   }
   .course-row:last-child { border-bottom: none; }
   .course-row .skill-name { color: var(--danger); font-weight: 600; min-width: 130px; }
   .course-row .course-name { color: var(--text); text-align: right; }
 
-  footer.nav-link {
-    text-align: center;
-    margin-top: 22px;
-    font-size: 13.5px;
-    color: var(--text-soft);
+  /* ---------- Admin dashboard ---------- */
+  .admin-shell { max-width: 980px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  .admin-header-row {
+    display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;
   }
-  footer.nav-link a { color: var(--navy); cursor: pointer; font-weight: 600; text-decoration: none; }
+  .refresh {
+    font-size: 13px; color: var(--navy); cursor: pointer; font-weight: 600;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 20px;
+    padding: 6px 14px;
+  }
+  .refresh:hover { border-color: var(--navy); }
+
+  .state-msg {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 40px 20px; text-align: center; color: var(--text-soft); font-size: 14px;
+  }
+
+  .programme-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px; margin-bottom: 34px;
+  }
+  .programme-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px 20px 18px; }
+  .programme-card h3 { font-size: 14.5px; font-weight: 700; line-height: 1.35; margin-bottom: 14px; min-height: 38px; }
+  .stat-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 13.5px; padding: 6px 0; border-top: 1px solid var(--border);
+  }
+  .stat-row:first-of-type { border-top: none; }
+  .stat-row .stat-label { color: var(--text-soft); }
+  .stat-row .stat-value { font-weight: 700; color: var(--navy); }
+  .stat-row .stat-value.good { color: var(--success); }
+  .stat-row .stat-value.bad { color: var(--danger); }
+
+  .section-heading { font-size: 17px; font-weight: 700; margin: 0 0 14px; }
+  table.detail {
+    width: 100%; border-collapse: collapse; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 13.5px;
+  }
+  table.detail th { text-align: left; background: var(--navy); color: #fff; font-weight: 600; padding: 11px 14px; font-size: 12.5px; }
+  table.detail td { padding: 12px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+  table.detail tr:hover td { background: #FAFAF8; }
+
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge.employed { background: var(--success-bg); color: var(--success); }
+  .badge.unemployed { background: var(--danger-bg); color: var(--danger); }
+  .badge.self { background: #EFF0EA; color: var(--text-soft); }
+
+  .field-tag { font-size: 11.5px; color: var(--text-soft); display: block; margin-top: 3px; }
+
+  .missing-skill {
+    display: inline-block; font-size: 12px; background: var(--danger-bg); color: var(--danger);
+    padding: 2px 8px; border-radius: 12px; margin: 2px 3px 0 0;
+  }
+
+  .match-bar-wrap { background: #EDEFEA; border-radius: 6px; height: 6px; width: 90px; margin-top: 6px; overflow: hidden; }
+  .match-bar { background: var(--navy); height: 100%; }
 </style>
 </head>
 <body>
 
+<nav class="app-nav">
+  <div class="app-nav-inner">
+    <div class="app-brand">Skill<span>Track</span></div>
+    <div class="app-switch">
+      <button id="navTrainee" class="active" onclick="switchApp('trainee')">Trainee Portal</button>
+      <button id="navAdmin" onclick="switchApp('admin')">Programme Dashboard</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ TRAINEE PORTAL ============ -->
+<div class="app-page active" id="page-trainee">
 <div class="shell">
   <header class="top">
-    <div class="brand">Skill<span>Track</span></div>
     <div class="id-pill" id="idPill" style="display:none;"></div>
   </header>
 
-  <!-- VIEW 1: Welcome / Login-or-Signup chooser -->
   <div class="view active" id="view-welcome">
     <div class="panel">
       <h1 class="page-title">See where you stand, and what's next.</h1>
@@ -277,7 +297,6 @@
     </div>
   </div>
 
-  <!-- VIEW 2: Profile form -->
   <div class="view" id="view-profile">
     <div class="panel">
       <h1 class="page-title">Tell us about your training</h1>
@@ -389,7 +408,6 @@
     </div>
   </div>
 
-  <!-- VIEW 3: Results -->
   <div class="view" id="view-results">
     <div class="panel">
       <h1 class="page-title" id="resultsGreeting">Your results</h1>
@@ -397,7 +415,10 @@
 
       <div class="score-block">
         <div class="score-number" id="scoreNumber">—</div>
-        <div class="score-label">match with what a <span id="scoreJobName">this role</span> role needs today</div>
+        <div class="score-label">
+          match with what a <span id="scoreJobName">this role</span> role needs today
+          <div id="scoreTrend" style="margin-top:6px; font-weight:600;"></div>
+        </div>
       </div>
 
       <h2 class="section-title">Skills you already have</h2>
@@ -412,17 +433,61 @@
       <button class="btn secondary" onclick="showView('welcome')" style="margin-left:0;">Back to start</button>
     </div>
   </div>
-
-  <footer class="nav-link" id="footerNote"></footer>
 </div>
+</div>
+<!-- ============ END TRAINEE PORTAL ============ -->
+
+<!-- ============ ADMIN DASHBOARD ============ -->
+<div class="app-page" id="page-admin">
+<div class="admin-shell">
+  <div class="admin-header-row">
+    <h1 class="page-title">Impact across skilling programmes</h1>
+    <div class="refresh" onclick="loadCohort()">Refresh data</div>
+  </div>
+  <p class="lead">Live view of every trainee's employment outcome and skill gap, grouped by the programme they trained under.</p>
+
+  <div id="errorBox"></div>
+  <div id="loadingBox" class="state-msg">Loading cohort data…</div>
+
+  <div id="content" style="display:none;">
+    <div class="programme-grid" id="programmeGrid"></div>
+
+    <h2 class="section-heading">Every trainee</h2>
+    <table class="detail">
+      <thead>
+        <tr>
+          <th>Trainee</th>
+          <th>Programme</th>
+          <th>Employment</th>
+          <th>Skill match</th>
+          <th>Missing skills</th>
+        </tr>
+      </thead>
+      <tbody id="traineeTableBody"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+<!-- ============ END ADMIN DASHBOARD ============ -->
 
 <script>
   const API_BASE = "http://127.0.0.1:8000";
+
+  // ---------- App-level nav (Trainee Portal <-> Programme Dashboard) ----------
+  function switchApp(which) {
+    document.getElementById('page-trainee').classList.toggle('active', which === 'trainee');
+    document.getElementById('page-admin').classList.toggle('active', which === 'admin');
+    document.getElementById('navTrainee').classList.toggle('active', which === 'trainee');
+    document.getElementById('navAdmin').classList.toggle('active', which === 'admin');
+    if (which === 'admin') loadCohort();
+  }
+
+  // ---------- Trainee portal state + logic ----------
   let currentTraineeId = null;
   let currentTraineeName = null;
 
   function showView(name) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('#page-trainee .view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + name).classList.add('active');
     document.getElementById('idPill').style.display = currentTraineeId ? 'inline-block' : 'none';
     if (currentTraineeId) {
@@ -594,9 +659,37 @@
     document.getElementById('scoreNumber').textContent = data.match_score_percent + '%';
     document.getElementById('scoreJobName').textContent = data.target_job;
 
+    // Show progress since programme start, if more than one check-in exists
+    const trendEl = document.getElementById('scoreTrend');
+    trendEl.textContent = '';
+    try {
+      const histRes = await fetch(`${API_BASE}/trainee/${currentTraineeId}/history`);
+      const hist = await histRes.json();
+      if (hist.checkins && hist.checkins.length > 1) {
+        const first = hist.checkins[0].skill_match_percent;
+        const latest = hist.checkins[hist.checkins.length - 1].skill_match_percent;
+        const delta = Math.round((latest - first) * 10) / 10;
+        const sign = delta >= 0 ? '+' : '';
+        const color = delta >= 0 ? '#3F7A5C' : '#B23A3A';
+        trendEl.innerHTML = `<span style="color:${color};">${sign}${delta} points since you started (${hist.checkins.length} check-ins)</span>`;
+      }
+    } catch (e) {
+      // History is a nice-to-have here — if it fails, the core result still shows.
+    }
+
+    // Build a quick lookup of proficiency tier per skill from skill_details,
+    // so matched-skill chips can show "Strong" vs "Adequate" rather than
+    // treating every pass as equally confident.
+    const proficiencyBySkill = {};
+    (data.skill_details || []).forEach(d => { proficiencyBySkill[d.required_skill] = d.proficiency; });
+
     const matchedEl = document.getElementById('matchedSkills');
     matchedEl.innerHTML = data.matched_skills.length
-      ? data.matched_skills.map(s => `<span class="skill-chip have">${s}</span>`).join('')
+      ? data.matched_skills.map(s => {
+          const tier = proficiencyBySkill[s];
+          const tierLabel = tier === 'Adequate' ? ' · adequate' : '';
+          return `<span class="skill-chip have">${s}${tierLabel}</span>`;
+        }).join('')
       : '<span style="color:#6B6F76; font-size:13.5px;">None matched yet.</span>';
 
     const missingEl = document.getElementById('missingSkills');
@@ -617,6 +710,106 @@
     }
 
     showView('results');
+  }
+
+  // ---------- Admin dashboard logic ----------
+  function employmentBadge(status, inField) {
+    if (status === "Employed") {
+      const tag = inField === true ? "In trained field" : (inField === false ? "Different field" : "");
+      return `<span class="badge employed">Employed</span>` + (tag ? `<span class="field-tag">${tag}</span>` : '');
+    }
+    if (status === "Self-employed") {
+      return `<span class="badge self">Self-employed</span>`;
+    }
+    return `<span class="badge unemployed">Unemployed</span>`;
+  }
+
+  function renderProgrammeCards(byProgram) {
+    const grid = document.getElementById('programmeGrid');
+    grid.innerHTML = '';
+    Object.entries(byProgram).forEach(([program, stats]) => {
+      const card = document.createElement('div');
+      card.className = 'programme-card';
+      const avg = stats.average_skill_match_percent;
+      const trend = stats.average_skill_match_trend;
+      let trendHtml = '';
+      if (trend !== null && trend !== undefined) {
+        const sign = trend >= 0 ? '+' : '';
+        const cls = trend >= 0 ? 'good' : 'bad';
+        trendHtml = `<div class="stat-row"><span class="stat-label">Avg. change since start</span><span class="stat-value ${cls}">${sign}${trend} pts</span></div>`;
+      }
+      card.innerHTML = `
+        <h3>${program}</h3>
+        <div class="stat-row"><span class="stat-label">Trainees</span><span class="stat-value">${stats.total_trainees}</span></div>
+        <div class="stat-row"><span class="stat-label">Employed</span><span class="stat-value good">${stats.employed_percent}%</span></div>
+        <div class="stat-row"><span class="stat-label">Employed, in-field</span><span class="stat-value good">${stats.employed_in_field_percent}%</span></div>
+        <div class="stat-row"><span class="stat-label">Unemployed</span><span class="stat-value bad">${stats.unemployed}</span></div>
+        <div class="stat-row"><span class="stat-label">Avg. skill match</span><span class="stat-value">${avg !== null ? avg + '%' : '—'}</span></div>
+        ${trendHtml}
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function renderTraineeTable(perTrainee) {
+    const body = document.getElementById('traineeTableBody');
+    body.innerHTML = perTrainee.map(r => {
+      if (r.error) {
+        return `
+          <tr>
+            <td><strong>${r.name}</strong><span class="field-tag">${r.trainee_id}</span></td>
+            <td>${r.training_program}</td>
+            <td colspan="3" style="color:#B23A3A;">${r.error}</td>
+          </tr>`;
+      }
+      const missing = r.missing_skills.length
+        ? r.missing_skills.map(s => `<span class="missing-skill">${s}</span>`).join('')
+        : '<span style="color:#3F7A5C; font-size:12.5px;">None — full match</span>';
+
+      let trendTag = '';
+      if (r.skill_match_trend !== null && r.skill_match_trend !== undefined) {
+        const sign = r.skill_match_trend >= 0 ? '+' : '';
+        const color = r.skill_match_trend >= 0 ? '#3F7A5C' : '#B23A3A';
+        trendTag = `<span class="field-tag" style="color:${color};">${sign}${r.skill_match_trend} pts since start · ${r.checkin_count} check-in${r.checkin_count === 1 ? '' : 's'}</span>`;
+      } else if (r.checkin_count) {
+        trendTag = `<span class="field-tag">${r.checkin_count} check-in${r.checkin_count === 1 ? '' : 's'} recorded</span>`;
+      }
+
+      return `
+        <tr>
+          <td><strong>${r.name}</strong><span class="field-tag">${r.trainee_id} · targeting ${r.target_job}</span></td>
+          <td>${r.training_program}</td>
+          <td>${employmentBadge(r.employment_status, r.matches_trained_field)}</td>
+          <td>
+            ${r.skill_match_percent}%
+            <div class="match-bar-wrap"><div class="match-bar" style="width:${r.skill_match_percent}%;"></div></div>
+            ${trendTag}
+          </td>
+          <td>${missing}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  async function loadCohort() {
+    document.getElementById('loadingBox').style.display = 'block';
+    document.getElementById('content').style.display = 'none';
+    document.getElementById('errorBox').innerHTML = '';
+
+    try {
+      const res = await fetch(`${API_BASE}/admin/cohort`);
+      if (!res.ok) throw new Error('Server returned an error.');
+      const data = await res.json();
+
+      renderProgrammeCards(data.by_program);
+      renderTraineeTable(data.per_trainee);
+
+      document.getElementById('loadingBox').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    } catch (e) {
+      document.getElementById('loadingBox').style.display = 'none';
+      document.getElementById('errorBox').innerHTML =
+        `<div class="error-msg" style="display:block;">Could not load cohort data. Make sure the API is running at ${API_BASE}.</div>`;
+    }
   }
 </script>
 
